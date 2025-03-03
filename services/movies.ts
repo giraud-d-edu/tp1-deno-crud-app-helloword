@@ -17,11 +17,7 @@ export class MovieService {
     }
 
     updateMovie(id: number, movie: Movie): Movie {
-        try {
-            return this.movieRepository.updateMovie(id, movie);
-        } catch (error: any) {
-            throw new Error(error.message);
-        }
+        return this.movieRepository.updateMovie(id, movie);
     }
 
     deleteMovie(id: number): void {

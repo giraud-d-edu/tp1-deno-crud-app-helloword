@@ -16,7 +16,7 @@ export function createActorService(actor: Actor) {
 }
 
 export function updateActorService(id: number, actor: Actor) {
-    if (typeof id !== "number" || id <= 0) {
+    if (typeof actor.id !== "number" || actor.id <= 0) {
         throw new Error("Actor ID must be a positive number.");
     }
     return updateActor(id, actor);

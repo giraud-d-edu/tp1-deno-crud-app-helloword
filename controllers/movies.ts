@@ -34,13 +34,8 @@ export class MoviesController {
         if (movie) {
             const body = await request.body.json();
             let movie = body as Movie;
-            try {
-                movie = this.movieService.updateMovie(parseInt(params.id), movie);
-                response.body = movie;
-            } catch (error: any) {
-                response.status = 400;
-                response.body = { message: error.message };
-            }
+            movie = this.movieService.updateMovie(parseInt(params.id), movie);
+            response.body = movie;
         } else {
             response.status = 404;
             response.body = { message: 'Movie not found' };

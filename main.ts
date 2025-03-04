@@ -1,6 +1,7 @@
 import { Application } from "jsr:@oak/oak/application";
 import { Router } from "jsr:@oak/oak/router";
 
+import { } from "./db.ts";
 import { moviesRouter } from "./routes/movies.ts";
 import { actorRouter } from "./routes/actor.ts";
 import { errorMiddleware } from "./middlewares/errorMiddleware.ts";

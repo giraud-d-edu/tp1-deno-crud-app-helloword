@@ -1,8 +1,8 @@
 import { Router } from "jsr:@oak/oak/router";
-import { ActorController } from "../controllers/ActorController.ts";
+import { Actors } from "../controllers/actors.ts";
 
 export const actorRouter = new Router();
-const controller = new ActorController();
+const controller = new Actors();
 
 actorRouter
     .get("/", controller.getActors)

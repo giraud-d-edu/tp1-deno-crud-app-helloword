@@ -1,32 +1,47 @@
 import { Actor } from "../models/actor.ts";
 import { ActorRepository } from "../repositories/actors.ts";
+import {ActorDTO, addActorDTO, updateActorDTO} from "../dtos/actors.ts";
 
 export class ActorService {
-    private readonly actorRepository: ActorRepository = new ActorRepository();
+    static readonly actorRepository: ActorRepository = new ActorRepository();
 
-    getAllActors(): Actor[] {
-        return this.actorRepository.getAllActors();
+    getAllActors(): ActorDTO[] {
+        return ActorService.actorRepository.getAllActors() as ActorDTO[];
     }
 
-    getActorById(id: number): Actor | undefined {
-        return this.actorRepository.getActorById(id);
+    getActorById(id: number): ActorDTO {
+        return ActorService.actorRepository.getActorById(id) as ActorDTO;
     }
 
-    addActor(actor: Actor) {
-        if (actor.firstName === null || actor.lastName === null) {
-            throw new Error("First name or last name are required.");
-        }
-        return this.actorRepository.addActor(actor);
+    addActor(actorDTO: addActorDTO) {
+//        if (actor.firstName === null || actor.lastName === null) {
+//            throw new Error("First name or last name are required.");
+//        }
+        let actor: Actor = {
+            id: 0,
+            firstName: actorDTO.firstName,
+            lastName: actorDTO.lastName,
+            movies: actorDTO.movies,
+        };
+        actor = ActorService.actorRepository.addActor(actor);
+        return actor as ActorDTO;
     }
 
-    updateActor(id: number, actor: Actor): Actor {
+    updateActor(id: number, actorDTO: updateActorDTO): ActorDTO {
 //        if (typeof actor.id !== "number" || actor.id <= 0) {
 //            throw new Error("Actor ID must be a positive number.");
 //        }
-          return this.actorRepository.updateActor(id, actor);
+        let actor = ActorService.actorRepository.getActorById(id);
+        actorDTO.firstName = actorDTO.firstName || actor.firstName;
+        actorDTO.lastName = actorDTO.lastName || actor.lastName;
+        actorDTO.movies = actorDTO.movies || actor.movies;
+
+        actor = ActorService.actorRepository.updateActor(id, actor);
+
+        return actor as ActorDTO;
     }
 
     deleteActor(id: number): void {
-        this.actorRepository.deleteActor(id);
+        ActorService.actorRepository.deleteActor(id);
     }
 }

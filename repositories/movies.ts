@@ -1,37 +1,43 @@
 import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
 import { Movie } from '../models/movie.ts';
-
-const movies: Movie[] = [] as Movie[];
+import { db } from '../db.ts';
+import { MovieDBO } from '../dbos/movies.ts';
+import { ObjectId } from "npm:mongodb@5.6.0";
 
 export class MovieRepository {
 
-    getMovies(): Movie[] {
+    private collection = db.collection<MovieDBO>('movies');
+
+    async getMovies(): Promise<Movie[]> {
+        const data = await this.collection.find().toArray();
+        const movies = data.map(movie => MovieDBO.toModel(movie));
         return movies;
     }
 
-    getMovieById (id: number): Movie {
-        const res = movies.find(movie => movie.id === id);
-        if (!res) throw createHttpError(404, 'Movie not found');
-        return res;
+    async getMovieById (id: string): Promise<Movie> {
+        if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid movie ID');
+        const data = await this.collection.findOne({ _id: new ObjectId(id) });
+        if (!data) throw createHttpError(404, 'Movie not found');
+        return MovieDBO.toModel(data);
     }
 
-    addMovie (movie: Movie): Movie {
-        movie.id = movies.length;
-        movies.push(movie);
+    async addMovie (movie: Movie): Promise<Movie> {
+        const data = await this.collection.insertOne(MovieDBO.fromModel(movie));
+        movie.id = data.toString();
         return movie;
     }
 
-    updateMovie (id: number, movie: Movie): Movie {
-        const index = movies.findIndex(movie => movie.id === id);
-        if (index === -1) throw createHttpError(404, 'Movie not found');
-        movies[index] = movie;
+    async updateMovie (id: string, movie: Movie): Promise<Movie> {
+        if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid movie ID');
+        const data = await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: MovieDBO.fromModel(movie) });
+        if (!data) throw createHttpError(404, 'Movie not found');
         return movie;
     }
 
-    deleteMovie (id: number): void {
-        const index = movies.findIndex(movie => movie.id === id);
-        if (index === -1) throw createHttpError(404, 'Movie not found');
-        movies.splice(index, 1);
+    async deleteMovie (id: string): Promise<void> {
+        if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid movie ID');
+        const data = await this.collection.deleteOne({ _id: new ObjectId(id) });
+        if (!data) throw createHttpError(404, 'Movie not found');
     }
 
 }

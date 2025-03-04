@@ -1,9 +1,8 @@
 import { ActorService } from "../services/actor.ts";
 import { addActorDTO, updateActorDTO } from "../dtos/actors.ts";
-import { Actor } from "../models/actor.ts";
 import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
 
-export class Actors {
+export class ActorController {
     private readonly actorService: ActorService = new ActorService();
 
     getActors = ({ response }: { response: any }) => {

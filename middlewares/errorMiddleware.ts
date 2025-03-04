@@ -27,7 +27,6 @@ export async function errorMiddleware(
     try {
         await next(); // Exécute le middleware suivant
     } catch (err: any) {
-        console.error(err);
         const status = isHttpError(err) ? err.status : 500;
         const errorMessage = err.message || "Erreur interne du serveur";
 

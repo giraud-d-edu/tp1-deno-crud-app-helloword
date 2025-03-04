@@ -2,7 +2,6 @@ import { MovieService } from "../services/movies.ts";
 import { ActorDTO, validateAddActorDTO, validateUpdateActorDTO } from "../dtos/actors.ts";
 import { ActorService } from "../services/actor.ts";
 import { Actor } from "../models/actor.ts";
-import {Movie} from "../models/movie.ts";
 
 export class ActorController {
     private readonly actorService: ActorService = new ActorService();
@@ -14,7 +13,7 @@ export class ActorController {
             lastName: actor.lastName,
             movies: []
         };
-        await actor.movies.forEach(async movieId => {
+        for (const movieId of actor.movies) {
             const movie = await MovieService.movieRepository.getMovieById(movieId);
             actorDTO.movies.push({
                 id: movie.id,
@@ -22,7 +21,7 @@ export class ActorController {
                 releaseYear: movie.releaseYear,
                 summary: movie.summary
             });
-        });
+        }
         return actorDTO;
     }
 

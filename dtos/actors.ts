@@ -4,14 +4,14 @@ export interface AddActorDTO {
     id: string;
     firstName: string;
     lastName: string;
-    movies: string[]; // Actor IDs
+    movies: string[]; // Movies IDs
 }
 
 export interface UpdateActorDTO {
     id?: string;
     firstName?: string;
     lastName?: string;
-    movies?: string[]; // Actor IDs
+    movies?: string[]; // Movies IDs
 }
 
 export interface ActorDTO {

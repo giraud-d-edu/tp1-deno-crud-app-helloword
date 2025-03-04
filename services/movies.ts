@@ -25,40 +25,40 @@ export class MovieService {
         return movieDto;
     }
 
-    getMovies(): MovieDTO[] {
-        const movies = MovieService.movieRepository.getMovies();
+    async getMovies(): Promise<MovieDTO[]> {
+        const movies = await MovieService.movieRepository.getMovies();
         return movies.map(movie => this.modelToDTO(movie));
     }
 
-    getMovieById(id: number): MovieDTO {
-        const movie = MovieService.movieRepository.getMovieById(id);
+    async getMovieById(id: string): Promise<MovieDTO> {
+        const movie = await MovieService.movieRepository.getMovieById(id);
         return this.modelToDTO(movie);
     }
 
-    addMovie(movieTdo: CreateMovieDTO): MovieDTO {
+    async addMovie(movieTdo: CreateMovieDTO): Promise<MovieDTO> {
         let movie: Movie = {
-            id: 0,
+            id: '',
             title: movieTdo.title,
             releaseYear: movieTdo.releaseYear,
             summary: movieTdo.summary,
             actors: movieTdo.actors
         };
-        movie = MovieService.movieRepository.addMovie(movie);
+        movie = await MovieService.movieRepository.addMovie(movie);
         return this.modelToDTO(movie);
     }
 
-    updateMovie(id: number, movieDtoUpdate: UpdateMovieDTO): MovieDTO {
-        let movie = MovieService.movieRepository.getMovieById(id);
+    async updateMovie(id: string, movieDtoUpdate: UpdateMovieDTO): Promise<MovieDTO> {
+        let movie = await MovieService.movieRepository.getMovieById(id);
         movie.title = movieDtoUpdate.title || movie.title;
         movie.releaseYear = movieDtoUpdate.releaseYear || movie.releaseYear;
         movie.summary = movieDtoUpdate.summary || movie.summary;
         movie.actors = movieDtoUpdate.actors || movie.actors;
 
-        movie = MovieService.movieRepository.updateMovie(id, movie);
+        movie = await MovieService.movieRepository.updateMovie(id, movie);
         return this.modelToDTO(movie);
     }
 
-    deleteMovie(id: number): void {
+    async deleteMovie(id: string): Promise<void> {
         MovieService.movieRepository.deleteMovie(id);
     }
 }

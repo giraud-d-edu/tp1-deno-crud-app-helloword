@@ -15,7 +15,7 @@ export interface UpdateMovieDTO {
 }
 
 export interface MovieDTO{
-    id: number;
+    id: string;
     title: string;
     releaseYear: number;
     summary: string;

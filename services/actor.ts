@@ -1,47 +1,26 @@
 import { Actor } from "../models/actor.ts";
 import { ActorRepository } from "../repositories/actors.ts";
-import {ActorDTO, addActorDTO, updateActorDTO} from "../dtos/actors.ts";
 
 export class ActorService {
     static readonly actorRepository: ActorRepository = new ActorRepository();
 
-    getAllActors(): ActorDTO[] {
-        return ActorService.actorRepository.getAllActors() as ActorDTO[];
+    async getActors(): Promise<Actor[]> {
+        return await ActorService.actorRepository.getAllActors();
     }
 
-    getActorById(id: number): ActorDTO {
-        return ActorService.actorRepository.getActorById(id) as ActorDTO;
+    async getActorById(id: string): Promise<Actor> {
+        return await ActorService.actorRepository.getActorById(id);
     }
 
-    addActor(actorDTO: addActorDTO) {
-//        if (actor.firstName === null || actor.lastName === null) {
-//            throw new Error("First name or last name are required.");
-//        }
-        let actor: Actor = {
-            id: 0,
-            firstName: actorDTO.firstName,
-            lastName: actorDTO.lastName,
-            movies: actorDTO.movies,
-        };
-        actor = ActorService.actorRepository.addActor(actor);
-        return actor as ActorDTO;
+    async addActor(actor: Actor): Promise<Actor> {
+        return await ActorService.actorRepository.addActor(actor);
     }
 
-    updateActor(id: number, actorDTO: updateActorDTO): ActorDTO {
-//        if (typeof actor.id !== "number" || actor.id <= 0) {
-//            throw new Error("Actor ID must be a positive number.");
-//        }
-        let actor = ActorService.actorRepository.getActorById(id);
-        actorDTO.firstName = actorDTO.firstName || actor.firstName;
-        actorDTO.lastName = actorDTO.lastName || actor.lastName;
-        actorDTO.movies = actorDTO.movies || actor.movies;
-
-        actor = ActorService.actorRepository.updateActor(id, actor);
-
-        return actor as ActorDTO;
+    async updateActor(id: string, actor: Actor): Promise<Actor> {
+        return await ActorService.actorRepository.updateActor(id, actor);
     }
 
-    deleteActor(id: number): void {
-        ActorService.actorRepository.deleteActor(id);
+    async deleteActor(id: string): Promise<void> {
+        await ActorService.actorRepository.deleteActor(id);
     }
 }

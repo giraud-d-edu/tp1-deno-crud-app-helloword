@@ -1,17 +1,18 @@
 import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
+import { ObjectId } from "npm:mongodb@5.6.0";
 
 export interface CreateMovieDTO {
     title: string;
     releaseYear: number;
     summary: string;
-    actors: number[]; // Liste des IDs d'acteurs
+    actors: string[]; // Liste des IDs d'acteurs
 }
 
 export interface UpdateMovieDTO {
     title?: string;
     releaseYear?: number;
     summary?: string;
-    actors?: number[];
+    actors?: string[];
 }
 
 export interface MovieDTO{
@@ -20,7 +21,7 @@ export interface MovieDTO{
     releaseYear: number;
     summary: string;
     actors: {
-        id: number;
+        id: string;
         firstName: string;
         lastName: string;
     }[];
@@ -50,7 +51,7 @@ export function validateCreateMovieDTO(data: any): CreateMovieDTO {
     }
 
     // Vérification de la liste des acteurs
-    if (!Array.isArray(actors) || !actors.every(id => typeof id === "number" && Number.isInteger(id) && id > 0)) {
+    if (!Array.isArray(actors) || !actors.every(id => typeof id === "string" && ObjectId.isValid(id))) {
         throw createHttpError(400, "La liste des acteurs doit contenir seulement des nombres entier positif.");
     }
 
@@ -77,8 +78,8 @@ export function validateUpdateMovieDTO(data: any): UpdateMovieDTO {
         throw createHttpError(400, "Le résumé doit contenir au moins 10 caractères.");
     }
 
-    if (actors !== undefined && (!Array.isArray(actors) || !actors.every(id => typeof id === "number" && Number.isInteger(id) && id > 0))) {
-        throw createHttpError(400, "La liste des acteurs doit contenir au moins un nombre entier positif.");
+    if (actors !== undefined && (!Array.isArray(actors) || !actors.every(id => typeof id === "string" && ObjectId.isValid(id)))) {
+        throw createHttpError(400, "L'argument passé doit être une chaîne de 12 octets ou une chaîne de 24 caractères hexadécimaux ou un entier");
     }
 
     return data;

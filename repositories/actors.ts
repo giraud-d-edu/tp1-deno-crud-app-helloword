@@ -1,13 +1,16 @@
 import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
 import { Actor } from '../models/actor.ts';
-
-const actors: Actor[] = [
-    { id: 1, lastName: "Radcliffe", firstName: "Daniel", movies: [] },
-    { id: 2, lastName: "Reeves", firstName: "Keanu", movies: [] },
-];
+import { db } from "../db.ts";
+import { ActorDBO } from "../dbos/actors.ts";
+import { ObjectId } from "npm:mongodb@5.6.0";
 
 export class ActorRepository {
-    getAllActors(): Actor[] {
+
+    private collection = db.collection<ActorDBO>('actors');
+
+    async getAllActors(): Promise<Actor[]> {
+        const data = await this.collection.find().toArray();
+        const actors = data.map(actor => ActorDBO.toModel(actor));
         if (actors.length === 0) {
             throw new Error("No actors found");
         } else {
@@ -15,31 +18,31 @@ export class ActorRepository {
         }
     }
 
-    getActorById(id: number): Actor {
-        const res = actors.find(actor => actor.id === id);
-        if (!res) throw createHttpError(404, 'Actor not found');
-        return res;
+    async getActorById(id: string): Promise<Actor> {
+        if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid actor ID');
+        const data = await this.collection.findOne({ _id: new ObjectId(id) });
+        if (!data) throw createHttpError(404, 'Actor not found');
+        return ActorDBO.toModel(data);
     }
 
-    addActor(actor: Actor) {
-        actor.id = actors.length;
-        actors.push(actor);
+    async addActor(actor: Actor): Promise<Actor> {
+        const data = await this.collection.insertOne(ActorDBO.fromModel(actor));
+        const insertedId = data.insertedId;
+        if (!insertedId) throw createHttpError(500, 'Failed to insert actor');
+        actor.id = insertedId.toHexString();
         return actor;
     }
 
-    updateActor(id: number, actor: Actor) {
-        if (id < 0 || id >= actors.length) {
-            throw new Error('Invalid actor ID : ' + id);
-        }
-        const index = actors.findIndex(actor => actor.id === id);
-        if (index === -1) throw createHttpError(404, 'Actor not found');
-        actors[index] = actor;
+    async updateActor(id: string, actor: Actor): Promise<Actor> {
+        if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid actor ID');
+        const data = await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: ActorDBO.fromModel(actor) });
+        if (!data) throw createHttpError(404, 'Actor not found');
         return actor;
     }
 
-    deleteActor(id: number) {
-        const index = actors.findIndex(actor => actor.id === id);
-        if (index === -1) throw createHttpError(404, 'Actor not found');
-        actors.splice(index, 1);
+    async deleteActor(id: string): Promise<void> {
+        if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid actor ID');
+        const data = await this.collection.deleteOne({ _id: new ObjectId(id) });
+        if (!data) throw createHttpError(404, 'Actor not found');
     }
 }

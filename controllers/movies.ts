@@ -7,7 +7,7 @@ import { Movie } from "../models/movie.ts";
 export class MoviesController {
     private readonly movieService: MovieService = new MovieService();
 
-    private modelToDTO(movies: Movie): MovieDTO {
+    private async modelToDTO(movies: Movie): Promise<MovieDTO> {
         const movieDto: MovieDTO = {
             id: movies.id,
             title: movies.title,
@@ -15,8 +15,8 @@ export class MoviesController {
             summary: movies.summary,
             actors: []
         };
-        movies.actors.forEach(actorId => {
-            const actor = ActorService.actorRepository.getActorById(actorId);
+        await movies.actors.forEach(async actorId => {
+            const actor = await ActorService.actorRepository.getActorById(actorId);
             movieDto.actors.push({
                 id: actor.id,
                 firstName: actor.firstName,
@@ -28,14 +28,14 @@ export class MoviesController {
 
     getMovies = async ({ response }: { response: any }) => {
         const movies = await this.movieService.getMovies();
-        movies.map(movie => this.modelToDTO(movie));
+        await movies.map(async movie => await this.modelToDTO(movie));
         response.body = movies;
         response.status = 200;
     }
 
     getMovieById = async ({ params, response }: { params: { id: string }, response: any }) => {
         const movie = await this.movieService.getMovieById(params.id);
-        response.body = this.modelToDTO(movie);
+        response.body = await this.modelToDTO(movie);
         response.status = 200;
     }
 
@@ -49,7 +49,7 @@ export class MoviesController {
             actors: movieDto.actors
         };
         movie = await this.movieService.addMovie(movie);
-        response.body = this.modelToDTO(movie);
+        response.body = await this.modelToDTO(movie);
         response.status = 201;
     }
 
@@ -64,7 +64,7 @@ export class MoviesController {
 
         movie = await this.movieService.updateMovie(params.id, movie);
 
-        response.body = this.modelToDTO(movie);
+        response.body = await this.modelToDTO(movie);
         response.status = 200;
     }
 

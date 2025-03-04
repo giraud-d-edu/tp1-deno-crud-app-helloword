@@ -11,11 +11,7 @@ export class ActorRepository {
     async getAllActors(): Promise<Actor[]> {
         const data = await this.collection.find().toArray();
         const actors = data.map(actor => ActorDBO.toModel(actor));
-        if (actors.length === 0) {
-            throw new Error("No actors found");
-        } else {
-            return actors;
-        }
+        return actors;
     }
 
     async getActorById(id: string): Promise<Actor> {

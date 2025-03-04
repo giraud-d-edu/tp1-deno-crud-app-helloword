@@ -1,3 +1,4 @@
+import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
 import { Movie } from '../models/movie.ts';
 
 const movies: Movie[] = [] as Movie[];
@@ -8,8 +9,10 @@ export class MovieRepository {
         return movies;
     }
 
-    getMovieById (id: number): Movie | undefined {
-        return movies.find(movie => movie.id === id);
+    getMovieById (id: number): Movie {
+        const res = movies.find(movie => movie.id === id);
+        if (!res) throw createHttpError(404, 'Movie not found');
+        return res;
     }
 
     addMovie (movie: Movie): Movie {
@@ -19,16 +22,15 @@ export class MovieRepository {
     }
 
     updateMovie (id: number, movie: Movie): Movie {
-        if (id < 0 || id >= movies.length) {
-            throw new Error('Invalid movie ID : ' + id);
-        }
         const index = movies.findIndex(movie => movie.id === id);
+        if (index === -1) throw createHttpError(404, 'Movie not found');
         movies[index] = movie;
         return movie;
     }
 
     deleteMovie (id: number): void {
         const index = movies.findIndex(movie => movie.id === id);
+        if (index === -1) throw createHttpError(404, 'Movie not found');
         movies.splice(index, 1);
     }
 

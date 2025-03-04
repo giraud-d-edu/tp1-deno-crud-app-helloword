@@ -39,7 +39,8 @@ export class MovieRepository {
     async deleteMovie (id: string): Promise<void> {
         if (!ObjectId.isValid(id)) throw createHttpError(400, 'Invalid movie ID');
         const data = await this.collection.deleteOne({ _id: new ObjectId(id) });
-        if (!data) throw createHttpError(404, 'Movie not found');
+        if (!data) throw createHttpError(500, 'Failed to delete movie');
+        if (data.deletedCount == 0) throw createHttpError(404, 'Movie not found');
     }
 
 }

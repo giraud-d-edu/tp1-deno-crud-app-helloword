@@ -23,7 +23,9 @@ export class MovieRepository {
 
     async addMovie (movie: Movie): Promise<Movie> {
         const data = await this.collection.insertOne(MovieDBO.fromModel(movie));
-        movie.id = data.toString();
+        const insertedId = data.insertedId;
+        if (!insertedId) throw createHttpError(500, 'Failed to insert movie');
+        movie.id = insertedId.toHexString();
         return movie;
     }
 

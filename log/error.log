@@ -1,7 +1,0 @@
-[2025-03-04T01:24:00.048Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 500 - Message: Movie not found
-[2025-03-04T01:24:23.538Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 500 - Message: Movie not found
-[2025-03-04T01:29:04.178Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 500 - Message: Movie not found
-[2025-03-04T01:31:32.262Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 500 - Message: Movie not found
-[2025-03-04T01:31:57.047Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 500 - Message: Movie not found
-[2025-03-04T01:32:50.897Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 500 - Message: 404
-[2025-03-04T01:34:08.440Z] ERROR: URL: http://localhost:8000/movies/-1 - Status: 404 - Message: Movie not found

@@ -17,7 +17,7 @@ export class ActorDBO {
 
     static fromModel(model: Actor): ActorDBO {
         return new ActorDBO(
-            model.id ? new ObjectId(model.id) : null,
+            model.id? new ObjectId(model.id): null,
             model.firstName,
             model.lastName,
             model.movies.map(movieId => new ObjectId(movieId))

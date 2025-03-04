@@ -7,31 +7,35 @@ import { Movie } from "../models/movie.ts";
 export class MoviesController {
     private readonly movieService: MovieService = new MovieService();
 
-    private async modelToDTO(movies: Movie): Promise<MovieDTO> {
+    private async modelToDTO(movie: Movie): Promise<MovieDTO> {
         const movieDto: MovieDTO = {
-            id: movies.id,
-            title: movies.title,
-            releaseYear: movies.releaseYear,
-            summary: movies.summary,
+            id: movie.id,
+            title: movie.title,
+            releaseYear: movie.releaseYear,
+            summary: movie.summary,
             actors: []
         };
-        await movies.actors.forEach(async actorId => {
+        for (const actorId of movie.actors) {
             const actor = await ActorService.actorRepository.getActorById(actorId);
             movieDto.actors.push({
                 id: actor.id,
                 firstName: actor.firstName,
                 lastName: actor.lastName,
             });
-        });
+        }
+        
         return movieDto;
     }
 
     getMovies = async ({ response }: { response: any }) => {
         const movies = await this.movieService.getMovies();
-        await movies.map(async movie => await this.modelToDTO(movie));
-        response.body = movies;
+        
+        const moviesDto = await Promise.all(movies.map(movie => this.modelToDTO(movie)));
+    
+        response.body = moviesDto;
         response.status = 200;
-    }
+    };
+    
 
     getMovieById = async ({ params, response }: { params: { id: string }, response: any }) => {
         const movie = await this.movieService.getMovieById(params.id);

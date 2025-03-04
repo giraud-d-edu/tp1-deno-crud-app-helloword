@@ -1,5 +1,4 @@
 import { Movie } from '../models/movie.ts';
-import { CreateMovieDTO, MovieDTO, UpdateMovieDTO } from '../dtos/movies.ts';
 import { MovieRepository } from "../repositories/movies.ts";
 
 export class MovieService {

@@ -1,50 +1,73 @@
+import { MovieService } from "../services/movies.ts";
+import { ActorDTO, validateAddActorDTO, validateUpdateActorDTO } from "../dtos/actors.ts";
 import { ActorService } from "../services/actor.ts";
-import { addActorDTO, updateActorDTO } from "../dtos/actors.ts";
-import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
+import { Actor } from "../models/actor.ts";
+import {Movie} from "../models/movie.ts";
 
 export class ActorController {
     private readonly actorService: ActorService = new ActorService();
 
-    getActors = ({ response }: { response: any }) => {
-        response.body = this.actorService.getAllActors();
+    private async modelToDTO(actor: Actor): Promise<ActorDTO> {
+        const actorDTO: ActorDTO = {
+            id: actor.id,
+            firstName: actor.firstName,
+            lastName: actor.lastName,
+            movies: []
+        };
+        await actor.movies.forEach(async movieId => {
+            const movie = await MovieService.movieRepository.getMovieById(movieId);
+            actorDTO.movies.push({
+                id: movie.id,
+                title: movie.title,
+                releaseYear: movie.releaseYear,
+                summary: movie.summary
+            });
+        });
+        return actorDTO;
+    }
+
+    getActors = async ({ response }: { response: any }) => {
+        const actors = await this.actorService.getActors();
+        await actors.map(async actor => await this.modelToDTO(actor));
+        response.body = actors;
         response.status = 200;
     }
 
-    getActorById = ({ params, response }: { params: { id: string }, response: any }) => {
-        const actor = this.actorService.getActorById(parseInt(params.id));
-        response.body = actor;
+    getActorById = async ({ params, response }: { params: { id: string }, response: any }) => {
+        const actor = await this.actorService.getActorById(params.id);
+        response.body = await this.modelToDTO(actor);
         response.status = 200;
     }
 
     addActor = async ({ request, response }: { request: any, response: any }) => {
-        const actorDTO = await request.body.json() as addActorDTO;
-        if (!actorDTO.firstName || !actorDTO.lastName) {
-            throw createHttpError(400, "First name and last name are required.");
-        }
-        const actor = this.actorService.addActor(actorDTO);
-        response.body = actor;
+        const actorDTO = validateAddActorDTO(await request.body.json());
+        let actor: Actor = {
+            id: '',
+            firstName: actorDTO.firstName,
+            lastName: actorDTO.lastName,
+            movies: actorDTO.movies
+        };
+
+        actor = await this.actorService.addActor(actor);
+        response.body = await this.modelToDTO(actor);
         response.status = 201;
     }
 
     updateActor = async ({ params, request, response }: { params: { id: string }, request: any, response: any }) => {
-        if (this.actorService.getActorById(parseInt(params.id))) {
-            const actorDTO = await request.body.json() as updateActorDTO;
-            if (!actorDTO.firstName && !actorDTO.lastName && !actorDTO.movies) {
-                throw createHttpError(400, "You must at least modify the last name, the first name or the movies to update.");
-            }
-            const actor = this.actorService.updateActor(parseInt(params.id), actorDTO);
-            response.body = actor;
-        }
+        const actorsDTO = validateUpdateActorDTO(await request.body.json());
+
+        let actor = await this.actorService.getActorById(params.id);
+
+        actor.firstName = actorsDTO.firstName || actor.firstName;
+        actor.lastName = actorsDTO.lastName || actor.lastName;
+        actor.movies = actorsDTO.movies || actor.movies;
+        actor = await this.actorService.updateActor(params.id, actor);
+        response.body = await this.modelToDTO(actor);
+        response.status = 200;
     }
 
-    deleteActor = ({ params, response }: { params: { id: string }, response: any }) => {
-        const actor = this.actorService.getActorById(parseInt(params.id));
-        if (actor) {
-            this.actorService.deleteActor(parseInt(params.id));
-            response.status = 204;
-        } else {
-            response.status = 404;
-            response.body = { message: 'Actor not found' };
-        }
+    deleteActor = async ({ params, response }: { params: { id: string }, response: any }) => {
+        await this.actorService.deleteActor(params.id);
+        response.status = 204;
     }
 }

@@ -1,6 +1,6 @@
 export interface Actor {
-    id: number;
+    id: string;
     firstName: string;
     lastName: string;
-    movies: number[]; // Movie IDs
+    movies: string[]; // Movie IDs
 }

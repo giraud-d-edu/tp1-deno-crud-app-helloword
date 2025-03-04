@@ -6,9 +6,9 @@ export class MovieDBO {
     title: string;
     releaseYear: number;
     summary: string;
-    actors: number[];
+    actors: ObjectId[];
 
-    constructor(_id: ObjectId|null, title: string, releaseYear: number, summary: string, actors: number[]) {
+    constructor(_id: ObjectId|null, title: string, releaseYear: number, summary: string, actors: ObjectId[]) {
         this.title = title;
         this.releaseYear = releaseYear;
         this.summary = summary;
@@ -22,17 +22,17 @@ export class MovieDBO {
             model.title,
             model.releaseYear,
             model.summary,
-            model.actors
+            model.actors.map(actorId => new ObjectId(actorId))
         );
     }
 
     static toModel(dbo: MovieDBO): Movie {
         return {
-            id: dbo._id.toHexString(),
+            id: dbo._id? dbo._id.toHexString() : '',
             title: dbo.title,
             releaseYear: dbo.releaseYear,
             summary: dbo.summary,
-            actors: dbo.actors
+            actors: dbo.actors.map(actorId => actorId.toHexString())
         };
     }
 }

@@ -1,22 +1,54 @@
+import { ActorService } from "../services/actor.ts";
 import { Actor } from "../models/actor.ts";
-import { getAllActorsService, getActorByIdService, createActorService, updateActorService, deleteActorService } from "../services/actor.ts"
 
-export function getAllActorsControllers(): Actor[] {
-    return getAllActorsService();
-}
+export class ActorController {
+    private readonly actorService: ActorService = new ActorService();
 
-export function getActorByIdControllers(id: number): Actor {
-    return getActorByIdService(id);
-}
+    getActors = ({ response }: { response: any }) => {
+        response.body = this.actorService.getAllActors();
+        response.status = 200;
+    }
 
-export function createActorControllers(Actor: Actor) {
-    return createActorService(Actor);
-}
+    getActorById = ({ params, response }: { params: { id: string }, response: any }) => {
+        const actor = this.actorService.getActorById(parseInt(params.id));
+        if (actor) {
+            response.status = 200;
+            response.body = actor;
+        } else {
+            response.status = 404;
+            response.body = { message: "Actor not found" };
+        }
+    }
 
-export function updateActorControllers(id: number, Actor: Actor) {
-    return updateActorService(id, Actor);
-}
+    addActor = async ({ request, response }: { request: any, response: any }) => {
+        const body = await request.body.json();
+        let actor = body as Actor;
+        actor = this.actorService.addActor(actor);
+        response.body = actor;
+        response.status = 201;
+    }
 
-export function deleteActorControllers(id: number) {
-    return deleteActorService(id);
+    updateActor = async ({ params, request, response }: { params: { id: string }, request: any, response: any }) => {
+        const actor = this.actorService.getActorById(parseInt(params.id));
+        if (actor) {
+            const body = await request.body.json();
+            let actor = body as Actor;
+            actor = this.actorService.updateActor(parseInt(params.id), actor);
+            response.body = actor;
+        } else {
+            response.status = 404;
+            response.body = { message: "Actor not found" };
+        }
+    }
+
+    deleteActor = ({ params, response }: { params: { id: string }, response: any }) => {
+        const actor = this.actorService.getActorById(parseInt(params.id));
+        if (actor) {
+            this.actorService.deleteActor(parseInt(params.id));
+            response.status = 204;
+        } else {
+            response.status = 404;
+            response.body = { message: 'Actor not found' };
+        }
+    }
 }

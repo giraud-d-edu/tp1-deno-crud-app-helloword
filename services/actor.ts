@@ -1,27 +1,32 @@
 import { Actor } from "../models/actor.ts";
+import { ActorRepository } from "../repositories/actors.ts";
 
-export function getAllActorsService(): Actor[] {
-    return getAllActors();
-}
+export class ActorService {
+    private readonly actorRepository: ActorRepository = new ActorRepository();
 
-export function getActorByIdService(id: number): Actor {
-    return getActorById(id);
-}
-
-export function createActorService(actor: Actor) {
-    if (actor.firstName === null || actor.lastName === null) {
-        throw new Error("First name or last name are required.");
+    getAllActors(): Actor[] {
+        return this.actorRepository.getAllActors();
     }
-    return createActor(actor);
-}
 
-export function updateActorService(id: number, actor: Actor) {
-    if (typeof actor.id !== "number" || actor.id <= 0) {
-        throw new Error("Actor ID must be a positive number.");
+    getActorById(id: number): Actor | undefined {
+        return this.actorRepository.getActorById(id);
     }
-    return updateActor(id, actor);
-}
 
-export function deleteActorService(id: number) {
-    return deleteActor(id);
+    addActor(actor: Actor) {
+        if (actor.firstName === null || actor.lastName === null) {
+            throw new Error("First name or last name are required.");
+        }
+        return this.actorRepository.addActor(actor);
+    }
+
+    updateActor(id: number, actor: Actor): Actor {
+//        if (typeof actor.id !== "number" || actor.id <= 0) {
+//            throw new Error("Actor ID must be a positive number.");
+//        }
+          return this.actorRepository.updateActor(id, actor);
+    }
+
+    deleteActor(id: number): void {
+        this.actorRepository.deleteActor(id);
+    }
 }

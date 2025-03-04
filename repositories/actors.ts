@@ -3,7 +3,6 @@ import { Actor } from '../models/actor.ts';
 import { db } from "../db.ts";
 import { ActorDBO } from "../dbos/actors.ts";
 import { ObjectId } from "npm:mongodb@5.6.0";
-import {MovieDBO} from "../dbos/movies.ts";
 
 export class ActorRepository {
 

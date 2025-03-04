@@ -51,7 +51,7 @@ export function validateCreateMovieDTO(data: any): CreateMovieDTO {
     }
 
     // Vérification de la liste des acteurs
-    if (!Array.isArray(actors) || !actors.every(id => typeof id === "string" && !ObjectId.isValid(id))) {
+    if (!Array.isArray(actors) || !actors.every(id => typeof id === "string" && ObjectId.isValid(id))) {
         throw createHttpError(400, "La liste des acteurs doit contenir seulement des nombres entier positif.");
     }
 
@@ -78,7 +78,7 @@ export function validateUpdateMovieDTO(data: any): UpdateMovieDTO {
         throw createHttpError(400, "Le résumé doit contenir au moins 10 caractères.");
     }
 
-    if (actors !== undefined && (!Array.isArray(actors) || !actors.every(id => typeof id === "number" && Number.isInteger(id) && id > 0))) {
+    if (actors !== undefined && (!Array.isArray(actors) || !actors.every(id => typeof id === "string" && ObjectId.isValid(id)))) {
         throw createHttpError(400, "L'argument passé doit être une chaîne de 12 octets ou une chaîne de 24 caractères hexadécimaux ou un entier");
     }
 

@@ -1,7 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { MovieService } from "../services/movies.ts";
-import { CreateMovieDTO, UpdateMovieDTO } from "../dtos/movies.ts";
-import { createHttpError } from "https://deno.land/x/oak@v17.1.4/deps.ts";
+import { validateCreateMovieDTO, validateUpdateMovieDTO } from "../dtos/movies.ts";
 
 export class MoviesController {
     private readonly movieService: MovieService = new MovieService();
@@ -18,28 +17,22 @@ export class MoviesController {
     }
 
     addMovie = async ({ request, response }: { request: any, response: any }) => {
-        const movieTdo = await request.body.json() as CreateMovieDTO;
-        const movie = this.movieService.addMovie(movieTdo);
+        const movieDto = validateCreateMovieDTO(await request.body.json());
+        const movie = this.movieService.addMovie(movieDto);
         response.body = movie;
         response.status = 201;
     }
 
     updateMovie = async ({ params, request, response }: { params: { id: string }, request: any, response: any }) => {
         if (this.movieService.getMovieById(parseInt(params.id))){
-            const moviesTdo = await request.body.json() as UpdateMovieDTO;
-            const movie = this.movieService.updateMovie(parseInt(params.id), moviesTdo);
+            const moviesDto = validateUpdateMovieDTO(await request.body.json());
+            const movie = this.movieService.updateMovie(parseInt(params.id), moviesDto);
             response.body = movie;
         }
     }
 
     deleteMovie = ({ params, response }: { params: { id: string }, response: any }) => {
-        const movie = this.movieService.getMovieById(parseInt(params.id));
-        if (movie) {
-            this.movieService.deleteMovie(parseInt(params.id));
-            response.status = 204;
-        } else {
-            response.status = 404;
-            response.body = { message: 'Movie not found' };
-        }
+        this.movieService.deleteMovie(parseInt(params.id));
+        response.status = 204;
     }
 }

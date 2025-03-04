@@ -48,7 +48,6 @@ export class MovieService {
     }
 
     updateMovie(id: number, movieDtoUpdate: UpdateMovieDTO): MovieDTO {
-        console.log(id, movieDtoUpdate);
         let movie = MovieService.movieRepository.getMovieById(id);
         movie.title = movieDtoUpdate.title || movie.title;
         movie.releaseYear = movieDtoUpdate.releaseYear || movie.releaseYear;
